@@ -13,11 +13,11 @@ export class UserService {
         return await this.usersRepository.findOne({ _id: userId });
     }
 
-    async createUser({ name, email, password }: { name: string; email: string; password: string;}) {
-        return await this.usersRepository.create({ name, email, password, role: 'user', created_at: new Date(), updated_at: new Date() });
+    async createUser({ username, email, password }: { username: string; email: string; password: string;}) {
+        return await this.usersRepository.create({ username, email, password, role: 'user', created_at: new Date(), updated_at: new Date() });
     }
 
-    async updateUser(userId: string, { name, email, password }: { name: string; email: string; password: string;}) {
-        return await this.usersRepository.findOneAndUpdate({ _id: userId }, { name, email, password, updated_at: new Date() });
+    async updateUser(userId: string, { username, email, password }: { username: string; email: string; password: string;}) {
+        return await this.usersRepository.findOneAndUpdate({ _id: userId }, { username, email, password, updated_at: new Date() });
     }
 }

@@ -18,7 +18,7 @@ export class UserController {
     }
 
     @Post()
-    async createUser(@Body() user: { name: string; email: string; password: string; }) {
+    async createUser(@Body() user: { username: string; email: string; password: string; }) {
         user.password = await bcrypt.hash(user.password, 10);
         return await this.userService.createUser(user);
     }
@@ -34,7 +34,7 @@ export class UserController {
     }
 
     @Patch(':id')
-    async updateUser(@Param('id') userId: string, @Body() user: { name: string; email: string; password: string; }) {
+    async updateUser(@Param('id') userId: string, @Body() user: { username: string; email: string; password: string; }) {
         return await this.userService.updateUser(userId, user);
     }
 }
