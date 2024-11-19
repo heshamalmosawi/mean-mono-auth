@@ -2,7 +2,9 @@
   "name": "@mean-mono-auth/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "backend": "cd backend && webpack-dev-server"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "~18.2.0",
@@ -15,8 +17,12 @@
     "@angular/router": "~18.2.0",
     "@nestjs/common": "^10.0.2",
     "@nestjs/core": "^10.0.2",
+    "@nestjs/mongoose": "^10.1.0",
     "@nestjs/platform-express": "^10.0.2",
+    "@types/bcrypt": "^5.0.2",
     "axios": "^1.6.0",
+    "bcrypt": "^5.1.1",
+    "mongoose": "^8.8.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.8.0",
     "zone.js": "~0.14.3"
