@@ -13,7 +13,12 @@ export class UserService {
         return await this.usersRepository.findOne({ _id: userId });
     }
 
+    async getUserByUserName(username: string) {
+        return await this.usersRepository.findOne({ username });
+    }
+
     async createUser({ username, email, password }: { username: string; email: string; password: string;}) {
+        console.log("creating user", username, email, password);
         return await this.usersRepository.create({ username, email, password, role: 'user', created_at: new Date(), updated_at: new Date() });
     }
 

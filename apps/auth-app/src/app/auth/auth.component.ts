@@ -4,7 +4,7 @@ import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { AuthState } from "../store/auth.reducer";
 import { Router } from "@angular/router";
-import { loginStart, registerStart } from "../store/auth.actions";
+import { loginStart, loginSuccess, registerStart, registerSuccess } from "../store/auth.actions";
 import { CommonModule } from "@angular/common";
 
 @Component({
@@ -33,24 +33,12 @@ export class AuthComponent implements OnInit {
         this.user$ = this.store.select(state => state.auth.user);
     }
 
-    // turning it to a standalone function so i can reuse it
-    initForm = () => {
-        if (this.isLoginMode) {
-            this.authForm = this.fb.group({
-              username: ['', Validators.required],
-              password: ['', Validators.required]
-            });
-          } else {
-            this.authForm = this.fb.group({
-              username: ['', Validators.required],
-              email: ['', [Validators.required, Validators.email]],
-              password: ['', Validators.required]
-            });
-          }
-    }
-
     ngOnInit(): void {
-        this.initForm();
+        this.authForm = this.fb.group({
+            username: ['', Validators.required],
+            email: [''],
+            password: ['', Validators.required]
+        });
 
         // this.user$.subscribe(user => {
         //     if (user) {
@@ -61,8 +49,16 @@ export class AuthComponent implements OnInit {
     }
 
     onSubmit() {
-        console.log("wtf", this.isLoginMode);
+        console.log("wtf", this.isLoginMode, this.authForm.value);
         if (!this.authForm.valid) {
+            console.log("invalid form");
+            Object.keys(this.authForm.controls).forEach(controlName => {
+                const control = this.authForm.get(controlName);
+                if (control && control.invalid) {
+                    console.log(`${controlName} is invalid:`, control.errors);
+                }
+            });
+    
             return;
         }
 
@@ -70,9 +66,37 @@ export class AuthComponent implements OnInit {
 
         if (this.isLoginMode) {
             this.store.dispatch(loginStart({ username, password }));
-            // fetch("localhost:3000/")
+            fetch("http://localhost:3000/api/user/login/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password }),
+                credentials: 'include'
+            }
+            ).then(response => response.json()).then(data => {
+                console.log(data);
+                const expirationDate = new Date();
+                expirationDate.setHours(expirationDate.getHours() + 8);
+                this.store.dispatch(loginSuccess({ user: data.user, token: "boo hoo", expiration: expirationDate }));
+                this.onSuccess();
+            } ).catch(err => console.log("found error:", err));
         } else {
-            this.store.dispatch(registerStart({ username, email, password }));
+            console.log("hello", JSON.stringify({ username, email, password }))
+            this.store.dispatch(registerStart({ username, email, password }))
+            fetch("http://localhost:3000/api/user/signup/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, email, password }),
+                credentials: 'include'
+            }
+            ).then(response => response.json()).then(data => {
+                console.log(data);
+                this.store.dispatch(registerSuccess({ user: data.user, token: "boo hoo" }));
+                this.onSuccess();
+            } ).catch(err => console.log("found error:", err));
         }
     }
 
@@ -80,11 +104,11 @@ export class AuthComponent implements OnInit {
         const expirationDate = new Date();
         expirationDate.setHours(expirationDate.getHours() + 8);
         document.cookie = `loggedIn=true; expires=${expirationDate.toUTCString()}; path=/`;
+        this.router.navigate(['/dashboard']);
     }
 
     toggleAuthMode() {
         this.isLoginMode = !this.isLoginMode;
-        this.initForm();
     }
 }
 

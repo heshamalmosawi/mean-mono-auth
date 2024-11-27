@@ -17,17 +17,18 @@ export class UserController {
         return await this.userService.getUsers();
     }
 
-    @Post()
+    @Post('signup')
     async createUser(@Body() user: { username: string; email: string; password: string; }) {
+        console.log("creating user", user);
         user.password = await bcrypt.hash(user.password, 10);
         return await this.userService.createUser(user);
     }
 
     // get user by id and password
-    @Get(':id/:password')
-    async getUserByIdAndPassword(@Param('id') userId: string, @Param('password') password: string) : Promise<User | null>{
-        const user = await this.userService.getUserById(userId);
-        if (user && await bcrypt.compare(password, user.password)) {
+    @Post('login')
+    async getUserByIdAndPassword(@Body() body: { username: string; password: string }): Promise<User | null> {
+        const user = await this.userService.getUserByUserName(body.username);
+        if (user && await bcrypt.compare(body.password, user.password)) {
             return user;
         }
         return null;
