@@ -1,0 +1,17 @@
+
+<div class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div class="bg-white p-6 max-w-lg w-full text-center">
+      <h1 class="text-xl font-bold mb-4">
+        Hello {{ uName }}
+      </h1>
+      <p class="mb-2">
+        You will be kicked out in:
+      </p>
+      <div class="text-2xl font-bold mb-4">
+        {{ timeRemaining }}
+      </div>
+    <button (click)="logout()" class="bg-indigo-500 hover:bg-indigo-700 text-white text-white py-2 px-4 rounded">
+        اطلع بروحي ولا المذلة
+    </button>
+    </div>
+</div>

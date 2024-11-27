@@ -4,8 +4,9 @@ import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { AuthState } from "../store/auth.reducer";
 import { Router } from "@angular/router";
-import { loginStart, loginSuccess, registerStart, registerSuccess } from "../store/auth.actions";
+import { loginFailure, loginStart, loginSuccess, registerFailure, registerStart, registerSuccess } from "../store/auth.actions";
 import { CommonModule } from "@angular/common";
+import { setCookie } from "../utils/cookies";
 
 @Component({
     standalone: true,
@@ -49,7 +50,6 @@ export class AuthComponent implements OnInit {
     }
 
     onSubmit() {
-        console.log("wtf", this.isLoginMode, this.authForm.value);
         if (!this.authForm.valid) {
             console.log("invalid form");
             Object.keys(this.authForm.controls).forEach(controlName => {
@@ -80,7 +80,10 @@ export class AuthComponent implements OnInit {
                 expirationDate.setHours(expirationDate.getHours() + 8);
                 this.store.dispatch(loginSuccess({ user: data.user, token: "boo hoo", expiration: expirationDate }));
                 this.onSuccess();
-            } ).catch(err => console.log("found error:", err));
+            } ).catch(err => {
+                console.log("found error:", err)
+                this.store.dispatch(loginFailure({ error: "Login failed. Please try again!" }));
+            });
         } else {
             console.log("hello", JSON.stringify({ username, email, password }))
             this.store.dispatch(registerStart({ username, email, password }))
@@ -96,14 +99,17 @@ export class AuthComponent implements OnInit {
                 console.log(data);
                 this.store.dispatch(registerSuccess({ user: data.user, token: "boo hoo" }));
                 this.onSuccess();
-            } ).catch(err => console.log("found error:", err));
+            } ).catch(err => {
+                console.log("found error:", err)
+                this.store.dispatch(registerFailure({ error: err }));
+            });
         }
     }
 
     onSuccess() {
-        const expirationDate = new Date();
-        expirationDate.setHours(expirationDate.getHours() + 8);
-        document.cookie = `loggedIn=true; expires=${expirationDate.toUTCString()}; path=/`;
+        setCookie();
+        setCookie(`uName=${this.authForm.value.username}`);
+        setCookie(`expiresAt=${new Date().getTime() + 8 * 60 * 60 * 1000}`);
         this.router.navigate(['/dashboard']);
     }
 
