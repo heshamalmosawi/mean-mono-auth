@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "backend": "cd backend && webpack-dev-server"
+    "backend": "cd backend && webpack-dev-server",
+    "app": "npx nx serve auth-app & npx nx serve backend"
   },
   "private": true,
   "dependencies": {
